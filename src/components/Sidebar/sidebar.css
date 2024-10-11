@@ -1,0 +1,54 @@
+.vertical-menu {
+    width: 250px; /* Adjust as needed */
+    background-color: #fff; /* Adjust as needed */
+    height: 100vh; /* Full height of the viewport */
+    position: fixed; /* Fixed position */
+    overflow-y: auto; /* Enable vertical scrolling */
+    overflow-x: hidden; /* Hide horizontal overflow */
+    transition: all 0.3s ease !important; 
+}
+
+.vertical-menu .h-100 {
+    height: auto; /* Adjust if necessary */
+}
+
+.sub-menu {
+    padding-left: 20px; /* Adjust for better visibility */
+    max-height: 0; /* Start with a max-height of 0 to hide */
+    overflow: hidden; /* Hide overflow */
+    transition: max-height 0.3s ease, padding 0.3s ease; /* Smooth transition for height and padding */
+}
+
+.sub-menu.show {
+    max-height: 200px; /* Set to the maximum height when shown, adjust as needed */
+    padding: 10px 20px; /* Add padding when shown */
+}
+
+/* Optional: Add a custom scrollbar */
+.vertical-menu::-webkit-scrollbar {
+    width: 4px; /* Width of the scrollbar */
+}
+
+.vertical-menu::-webkit-scrollbar-thumb {
+    background: #8888885b; /* Color of the scrollbar thumb */
+    border-radius: 2px; /* Rounded corners */
+}
+
+.vertical-menu::-webkit-scrollbar-thumb:hover {
+    background: #55555514; /* Color on hover */
+}
+
+/* New style for active menu item */
+.vertical-menu .metismenu a.active {
+    color: #556ee6 !important; /* Change font color for the active item */
+    /* Optional: make the active item bold */
+}
+
+/* Smooth transition for the main menu items */
+.sidebar-container {
+    position: relative;
+}
+
+.sidebar-container .menu-item {
+    transition: padding 0.3s ease; /* Smooth transition for menu items */
+}

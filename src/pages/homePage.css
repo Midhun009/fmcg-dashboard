@@ -1,0 +1,32 @@
+
+.homepage-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh; 
+}
+
+.sidebar-and-content {
+    display: flex;
+    flex: 1; 
+}
+
+.sidebar {
+    width: 250px; 
+    background-color: #f4f4f4;
+}
+
+.main-content {
+    flex: 1;
+    padding-top: 90px !important; /* Add some padding for spacing */
+    padding-left: 30px !important;
+    overflow-y: auto; /* Enable scrolling if content overflows */
+}
+
+.header {
+    height: 60px; /* Set a height for the header */
+    background-color: #007bff; /* Header background */
+    color: white; /* Header text color */
+    display: flex;
+    align-items: center; /* Center items vertically */
+    padding: 0 20px; /* Padding for header */
+}

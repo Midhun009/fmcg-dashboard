@@ -1,0 +1,31 @@
+
+@font-face {
+    font-family: 'Boxicons';
+    src: url('./boxicons.eot'); /* IE9 Compat Modes */
+    src: url('./boxicons.woff2') format('woff2'),
+         url('./boxicons.woff') format('woff'),
+         url('./boxicons.ttf') format('truetype'),
+         url('./boxiconsd41d.svg') format('svg');
+  }
+
+  @font-face {
+    font-family: 'Dripicons';
+    src: url('./dripicons-v2.eot'); /* IE9 Compat Modes */
+    src: url('./dripicons-v2.woff') format('woff'),
+         url('./dripicons-v2.woff') format('woff'),
+         url('./dripicons-v2.ttf') format('truetype'),
+         url('./dripicons-v2.svg#Dripicons') format('svg');
+  }
+
+  @font-face {
+    font-family: 'Font Awesome 5 Brands';
+    src: url('./fa-brands-400.eot'); /* IE9 Compat Modes */
+    src: url('./fa-brands-400.eot?#iefix') format('embedded-opentype'),
+         url('./fa-brands-400.woff2') format('woff2'),
+         url('./fa-brands-400.woff') format('woff'),
+         url('./fa-brands-400.ttf') format('truetype'),
+         url('./fa-brands-400.svg#fontawesome') format('svg');
+  }
+  
+
+  
