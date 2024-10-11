@@ -15,6 +15,7 @@ import './assets/css/bootstrap.min.css'
 import './assets/css/icons.min.css'
 import 'bootstrap/dist/css/bootstrap.min.css';
 
+import "bootstrap/dist/css/bootstrap.min.css";
 
 
 // Make jQuery available globally if needed

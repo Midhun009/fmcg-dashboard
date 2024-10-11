@@ -144,26 +144,26 @@ const Sidebar = () => {
                 aria-expanded={openSubmenu === "inquiries"}
               >
                 <li>
-                  <a
-                    href="javascript:void(0);"
+                  <Link
+                    to="/listing-enquiry"
                     className={
                       selectedItem === "listingEnquiry" ? "active" : ""
                     }
                     onClick={() => handleItemClick("listingEnquiry")}
                   >
                     Listing Enquiry
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
-                    href="javascript:void(0);"
+                  <Link
+                    to="/product-enquiry"
                     className={
                       selectedItem === "productEnquiry" ? "active" : ""
                     }
                     onClick={() => handleItemClick("productEnquiry")}
                   >
                     Product Enquiry
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </li>
