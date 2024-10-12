@@ -17,6 +17,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 import "bootstrap/dist/css/bootstrap.min.css";
 
+import "bootstrap/dist/js/bootstrap.bundle.min.js";
 
 // Make jQuery available globally if needed
 window.jQuery = $;

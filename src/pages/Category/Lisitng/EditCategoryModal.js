@@ -1,199 +1,205 @@
 import React, { useState, useEffect } from "react";
+import PropTypes from "prop-types";
+import { editCategory } from "./api"; // Adjust the path as necessary
 
-const EditCategoryModal = ({ category }) => {
-  const [formData, setFormData] = useState({
+const EditCategoryModal = ({
+  visible,
+  onClose,
+  onFetchCategories,
+  categoryToEdit,
+}) => {
+  const [category, setCategory] = useState({
     name: "",
     image: null,
     slug: "",
-    metaTitle: "",
-    imageAlt: "",
-    metaDescription: "",
+    seo_title: "",
+    image_alt: "",
+    seo_description: "",
   });
+  const [error, setError] = useState(""); // State for error messages
 
-  // Update formData when category prop changes
+  // Effect to set the initial state from the category to edit
   useEffect(() => {
-    if (category) {
-      setFormData({
-        name: category.name,
-        image: null, // Keep image as null or manage separately if needed
-        slug: category.slug,
-        metaTitle: category.metaTitle || "",
-        imageAlt: category.imageAlt || "",
-        metaDescription: category.metaDescription || "",
+    if (categoryToEdit) {
+      setCategory({
+        name: categoryToEdit?.name || "",
+        image: null, // Reset image input to avoid conflicts
+        slug: categoryToEdit?.slug || "",
+        seo_title: categoryToEdit?.seo_title || "",
+        image_alt: categoryToEdit?.image_alt || "",
+        seo_description: categoryToEdit?.seo_description || "",
       });
     }
-  }, [category]);
+  }, [categoryToEdit]);
 
-  // Handle input changes
+  // Handle input field changes
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
-
-  // Handle file change
-  const handleFileChange = (e) => {
-    setFormData({ ...formData, image: e.target.files[0] });
+    const { name, value, files } = e.target;
+    if (name === "image") {
+      setCategory((prevCategory) => ({
+        ...prevCategory,
+        image: files?.[0] || null, // Update with the selected file or null
+      }));
+    } else {
+      setCategory((prevCategory) => ({
+        ...prevCategory,
+        [name]: value,
+      }));
+    }
   };
 
   // Handle form submission
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Form data submitted:", formData);
-    // You can add API call logic here to update the category
+    setError(""); // Reset error message
+
+    // Prepare form data
+    const formData = new FormData();
+    formData.append("name", category.name);
+    formData.append("slug", category.slug);
+    formData.append("seo_title", category.seo_title);
+    formData.append("image_alt", category.image_alt);
+    formData.append("seo_description", category.seo_description);
+
+    if (category.image && category.image instanceof File) {
+      formData.append("image", category.image); // Append image if a new file is selected
+    }
+
+    try {
+      await editCategory(categoryToEdit.id, formData); // Call API to update category
+      await onFetchCategories(); // Fetch updated categories list
+      onClose(); // Close the modal
+    } catch (error) {
+      console.error("Error updating category:", error);
+      setError("Failed to update category. Please try again."); // Set error message
+    }
   };
+
+  if (!visible) return null; // Return null if the modal is not visible
 
   return (
     <div
-      className="modal fade"
-      id="editCategoryModal"
+      className={`modal fade ${visible ? "show" : ""}`}
+      style={{ display: visible ? "block" : "none" }}
       tabIndex="-1"
-      aria-labelledby="editCategoryModalLabel"
-      aria-hidden="true"
+      role="dialog"
     >
-      <div className="modal-dialog modal-dialog-centered">
+      <div className="modal-dialog" role="document">
         <div className="modal-content">
           <div className="modal-header">
-            <h5 className="modal-title" id="editCategoryModalLabel">
-              Edit Category
-            </h5>
+            <h5 className="modal-title">Edit Category</h5>
             <button
               type="button"
-              className="btn-close"
-              data-bs-dismiss="modal"
+              className="btn btn-secondary"
+              onClick={onClose}
               aria-label="Close"
-            ></button>
+            >
+              <i className="bi bi-x-circle"></i>
+            </button>
           </div>
           <div className="modal-body">
-            <form
-              autoComplete="off"
-              className="needs-validation"
-              id="editCategoryForm"
-              noValidate
-              onSubmit={handleSubmit}
-            >
-              <div className="mb-3">
-                <label htmlFor="editCategoryNameField" className="form-label">
-                  Category Name
-                </label>
+            {error && <div className="alert alert-danger">{error}</div>}{" "}
+            {/* Display error message */}
+            <form onSubmit={handleSubmit}>
+              <div className="form-group">
+                <label htmlFor="categoryName">Category Name</label>
                 <input
                   type="text"
-                  id="editCategoryNameField"
-                  name="name"
                   className="form-control"
+                  id="categoryName"
+                  name="name"
+                  value={category.name}
+                  onChange={handleChange}
                   placeholder="Enter category name"
                   required
-                  value={formData.name}
-                  onChange={handleChange}
                 />
-                <div className="invalid-feedback">
-                  Please enter a category name.
-                </div>
               </div>
-
-              <div className="mb-3">
-                <label htmlFor="editFormFile" className="form-label">
-                  Image
-                </label>
-                <input
-                  className="form-control"
-                  type="file"
-                  id="editFormFile"
-                  onChange={handleFileChange}
-                />
-                <div className="invalid-feedback">Please upload an image.</div>
-                {formData.image && (
-                  <div className="mt-2">
-                    <strong>Current Image:</strong> {formData.image.name}
+              <div className="form-group">
+                <label htmlFor="categoryImage">Image Upload</label>
+                {categoryToEdit?.image && (
+                  <div>
+                    <a
+                      href={categoryToEdit.image}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      View Current Image
+                    </a>
+                    <p>Current Image Preview:</p>
+                    <img
+                      src={categoryToEdit.image}
+                      alt="Current"
+                      style={{ width: "100px", height: "auto" }}
+                    />
                   </div>
                 )}
+                <input
+                  type="file"
+                  className="form-control"
+                  id="categoryImage"
+                  name="image"
+                  accept="image/*"
+                  onChange={handleChange}
+                />
               </div>
-
-              <div className="mb-3">
-                <label htmlFor="editSlugField" className="form-label">
-                  Slug
-                </label>
+              <div className="form-group">
+                <label htmlFor="slug">Slug</label>
                 <input
                   type="text"
-                  id="editSlugField"
-                  name="slug"
                   className="form-control"
+                  id="slug"
+                  name="slug"
+                  value={category.slug}
+                  onChange={handleChange}
                   placeholder="Enter slug"
                   required
-                  value={formData.slug}
-                  onChange={handleChange}
                 />
-                <div className="invalid-feedback">Please enter a slug.</div>
               </div>
-
-              <div className="mb-3">
-                <label htmlFor="editMetaTitleField" className="form-label">
-                  Meta Title
-                </label>
+              <div className="form-group">
+                <label htmlFor="seoTitle">SEO Title</label>
                 <input
                   type="text"
-                  id="editMetaTitleField"
-                  name="metaTitle"
                   className="form-control"
-                  placeholder="Meta title"
-                  required
-                  value={formData.metaTitle}
+                  id="seoTitle"
+                  name="seo_title"
+                  value={category.seo_title}
                   onChange={handleChange}
+                  placeholder="Enter SEO title"
                 />
-                <div className="invalid-feedback">
-                  Please enter a meta title.
-                </div>
               </div>
-
-              <div className="mb-3">
-                <label htmlFor="editImageAltField" className="form-label">
-                  Image Alt
-                </label>
+              <div className="form-group">
+                <label htmlFor="imageAlt">Image Alt</label>
                 <input
                   type="text"
-                  id="editImageAltField"
-                  name="imageAlt"
                   className="form-control"
-                  placeholder="Image alt"
-                  required
-                  value={formData.imageAlt}
+                  id="imageAlt"
+                  name="image_alt"
+                  value={category.image_alt}
                   onChange={handleChange}
+                  placeholder="Enter image alt text"
                 />
-                <div className="invalid-feedback">
-                  Please enter an image alt.
-                </div>
               </div>
-
-              <div className="mb-3">
-                <label
-                  htmlFor="editMetaDescriptionField"
-                  className="form-label"
-                >
-                  Meta Description
-                </label>
+              <div className="form-group">
+                <label htmlFor="seoDescription">SEO Description</label>
                 <textarea
-                  id="editMetaDescriptionField"
-                  name="metaDescription"
                   className="form-control"
-                  rows="3"
-                  placeholder="Meta description"
-                  value={formData.metaDescription}
+                  id="seoDescription"
+                  name="seo_description"
+                  value={category.seo_description}
                   onChange={handleChange}
+                  placeholder="Enter SEO description"
                 ></textarea>
               </div>
-
               <div className="modal-footer">
                 <button
                   type="button"
                   className="btn btn-secondary"
-                  data-bs-dismiss="modal"
+                  onClick={onClose}
                 >
-                  Close
+                  <i className="bi bi-x-circle"></i>
                 </button>
                 <button type="submit" className="btn btn-primary">
-                  Save changes
+                  Update Category
                 </button>
               </div>
             </form>
@@ -202,6 +208,14 @@ const EditCategoryModal = ({ category }) => {
       </div>
     </div>
   );
+};
+
+// Prop types for validation
+EditCategoryModal.propTypes = {
+  visible: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  onFetchCategories: PropTypes.func.isRequired,
+  categoryToEdit: PropTypes.object.isRequired,
 };
 
 export default EditCategoryModal;

@@ -1,38 +1,88 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { toast, ToastContainer } from "react-toastify"; // Ensure toast is imported
+import "react-toastify/dist/ReactToastify.css";
+import {
+  getCategories,
+  createCategory,
+  editCategory,
+  deleteCategory,
+} from "./api"; // Adjust the import based on your file structure
 import AddCategoryModal from "./AddCategoryModal";
 import EditCategoryModal from "./EditCategoryModal";
-import ViewCategoryModal from "./DetailModal"; // Ensure you have the right import for the view modal
+import ViewCategoryModal from "./DetailModal"; // Corrected import name
 import DeleteCategoryModal from "./DeleteCategoryModal";
 
-// Dummy Data
-const categories = [
-  {
-    id: 1,
-    name: "Neal Matthews",
-    image: "image-url", // Replace with actual image URL
-    slug: "neal-matthews",
-    createdDate: "2024-10-10",
-    updatedDate: "2024-10-11",
-    metaTitle: "Neal Matthews Meta Title",
-    imageAlt: "Neal Matthews Image Alt",
-    metaDescription: "Neal Matthews Meta Description",
-  },
-  // Add more dummy data as needed
-];
-
 const ListingCategory = () => {
+  const [categories, setCategories] = useState([]); // State to hold categories
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [isAddModalVisible, setIsAddModalVisible] = useState(false); // State to manage AddCategoryModal visibility
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false); // State for Edit modal visibility
+  const [isViewModalVisible, setIsViewModalVisible] = useState(false); // State for View modal visibility
+  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
 
-  const handleEditClick = (category) => {
-    setSelectedCategory(category);
+  // Fetch categories on component mount
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  const fetchCategories = async () => {
+    try {
+      const data = await getCategories(); // Call the API to get categories
+      setCategories(data); // Set the categories state
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+      toast.error("Error fetching categories. Please try again."); // Notify user of the error
+    }
   };
 
-  const handleViewClick = (category) => {
+  const handleAddCategory = async (newCategory) => {
+    // Optimistically update the UI
+    setCategories((prevCategories) => [...prevCategories, newCategory]);
+    toast.success("Category added successfully!");
+    setIsAddModalVisible(false);
+    await fetchCategories(); // Ensure the function name is correct
+  };
+
+  const handleEditCategory = async (updatedCategory) => {
+    // Update the local state to reflect the edit
+    setCategories((prevCategories) =>
+      prevCategories.map((category) =>
+        category.id === updatedCategory.id ? updatedCategory : category
+      )
+    );
+    toast.success("Category updated successfully!");
+    setIsEditModalVisible(false);
+    await fetchCategories(); // Ensure the function name is correct
+  };
+
+  const handleDeleteClick = (category) => {
     setSelectedCategory(category);
+    setIsDeleteModalVisible(true); // Set the delete modal to visible
+  };
+
+  // Handle deleting a category
+  const handleDeleteCategory = (categoryId) => {
+    // Remove category from state
+    setCategories((prevCategories) =>
+      prevCategories.filter((category) => category.id !== categoryId)
+    );
+   
+  };
+
+  const handleEditClick = (category) => {
+    setSelectedCategory(category); // Set the selected category for editing
+    setIsEditModalVisible(true); // Open the Edit modal
+  };
+
+  // Define the handleViewClick function
+  const handleViewClick = (category) => {
+    setSelectedCategory(category); // Set the selected category for viewing
+    setIsViewModalVisible(true); // Open the View modal
   };
 
   return (
     <div className="page-content">
+      <ToastContainer /> {/* Ensure ToastContainer is included */}
       <div className="container-fluid">
         {/* Start Page Title */}
         <div className="row">
@@ -74,20 +124,7 @@ const ListingCategory = () => {
                       <button
                         type="button"
                         className="btn btn-success btn-rounded waves-effect waves-light mb-2 me-2"
-                      >
-                        <i className="mdi mdi-download me-1"></i> Export
-                      </button>
-                      <button
-                        type="button"
-                        className="btn btn-success btn-rounded waves-effect waves-light mb-2 me-2"
-                      >
-                        <i className="mdi mdi-upload me-1"></i> Import
-                      </button>
-                      <button
-                        type="button"
-                        className="btn btn-success btn-rounded waves-effect waves-light mb-2 me-2"
-                        data-bs-toggle="modal"
-                        data-bs-target="#addCategoryModal"
+                        onClick={() => setIsAddModalVisible(true)} // Open Add Category modal
                       >
                         <i className="mdi mdi-plus me-1"></i> Add Category
                       </button>
@@ -99,25 +136,10 @@ const ListingCategory = () => {
                   <table className="table table-striped table-hover align-middle table-nowrap">
                     <thead className="table-light">
                       <tr>
-                        <th style={{ width: "20px" }} className="align-middle">
-                          <div className="form-check font-size-16">
-                            <input
-                              className="form-check-input"
-                              type="checkbox"
-                              id="checkAll"
-                            />
-                            <label
-                              className="form-check-label"
-                              htmlFor="checkAll"
-                            ></label>
-                          </div>
-                        </th>
                         <th className="align-middle">ID</th>
                         <th className="align-middle">Name</th>
                         <th className="align-middle">Image</th>
                         <th className="align-middle">Slug</th>
-                        <th className="align-middle">Created Date</th>
-                        <th className="align-middle">Updated Date</th>
                         <th className="align-middle">View Details</th>
                         <th className="align-middle">Action</th>
                       </tr>
@@ -125,133 +147,84 @@ const ListingCategory = () => {
                     <tbody>
                       {categories.map((category) => (
                         <tr key={category.id}>
-                          <td>
-                            <div className="form-check font-size-16">
-                              <input
-                                className="form-check-input"
-                                type="checkbox"
-                                id={`orderidcheck${category.id}`}
-                              />
-                              <label
-                                className="form-check-label"
-                                htmlFor={`orderidcheck${category.id}`}
-                              ></label>
-                            </div>
-                          </td>
-                          <td>
-                            <a
-                              href="javascript:void(0);"
-                              className="text-body fw-bold"
-                            >
-                              #SK{category.id}
-                            </a>
-                          </td>
+                          <td>{category.id}</td>
                           <td>{category.name}</td>
                           <td>
                             <img
                               src={category.image}
-                              alt="Image"
-                              className="img-thumbnail"
-                              style={{ width: "50px" }}
+                              alt={category.name}
+                              style={{ width: "50px", height: "50px" }}
                             />
                           </td>
                           <td>{category.slug}</td>
-                          <td>{category.createdDate}</td>
-                          <td>{category.updatedDate}</td>
                           <td>
                             <button
                               type="button"
-                              className="btn btn-primary btn-sm btn-rounded"
-                              data-bs-toggle="modal"
-                              data-bs-target="#viewCategoryModal"
-                              onClick={() => handleViewClick(category)}
+                              className="btn btn-primary"
+                              onClick={() => handleViewClick(category)} // Opens the View modal with the selected category
                             >
-                              View Details
+                              View Category
                             </button>
                           </td>
                           <td>
-                            <div className="d-flex gap-3">
-                              <a
-                                href="javascript:void(0);"
-                                className="text-success"
-                                onClick={() => handleEditClick(category)}
-                                data-bs-toggle="modal"
-                                data-bs-target="#editCategoryModal"
-                              >
-                                <i className="mdi mdi-pencil font-size-18"></i>
-                              </a>
-                              <a
-                                href="javascript:void(0);"
-                                className="text-danger"
-                                data-bs-toggle="modal"
-                                data-bs-target="#deleteCategoryModal"
-                              >
-                                <i className="mdi mdi-delete font-size-18"></i>
-                              </a>
-                            </div>
+                            <button
+                              type="button"
+                              className="btn btn-primary"
+                              onClick={() => handleEditClick(category)} // Open Edit modal
+                            >
+                              Edit
+                            </button>
+                            <button
+                              type="button"
+                              className="btn btn-danger"
+                              onClick={() => handleDeleteClick(category)} // Open Delete modal
+                            >
+                              Delete
+                            </button>
                           </td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 </div>
-
-                <ul className="pagination pagination-rounded justify-content-end mb-2">
-                  <li className="page-item disabled">
-                    <a
-                      className="page-link"
-                      href="javascript: void(0);"
-                      aria-label="Previous"
-                    >
-                      <i className="mdi mdi-chevron-left"></i>
-                    </a>
-                  </li>
-                  <li className="page-item active">
-                    <a className="page-link" href="javascript: void(0);">
-                      1
-                    </a>
-                  </li>
-                  <li className="page-item">
-                    <a className="page-link" href="javascript: void(0);">
-                      2
-                    </a>
-                  </li>
-                  <li className="page-item">
-                    <a className="page-link" href="javascript: void(0);">
-                      3
-                    </a>
-                  </li>
-                  <li className="page-item">
-                    <a className="page-link" href="javascript: void(0);">
-                      4
-                    </a>
-                  </li>
-                  <li className="page-item">
-                    <a className="page-link" href="javascript: void(0);">
-                      5
-                    </a>
-                  </li>
-                  <li className="page-item">
-                    <a
-                      className="page-link"
-                      href="javascript: void(0);"
-                      aria-label="Next"
-                    >
-                      <i className="mdi mdi-chevron-right"></i>
-                    </a>
-                  </li>
-                </ul>
               </div>
             </div>
           </div>
         </div>
-        {/* End Row */}
       </div>
-      {/* Modals */}
-      <AddCategoryModal />
-      <EditCategoryModal category={selectedCategory} />
-      <ViewCategoryModal category={selectedCategory} />
-      <DeleteCategoryModal />
+      {/* Add Category Modal */}
+      <AddCategoryModal
+        visible={isAddModalVisible}
+        onClose={() => setIsAddModalVisible(false)}
+        onFetchCategories={fetchCategories} // Correctly pass the fetch function
+        onAddCategory={handleAddCategory} // Pass the add handler
+      />
+      {/* Edit Category Modal */}
+      {selectedCategory && (
+        <EditCategoryModal
+          visible={isEditModalVisible}
+          onClose={() => setIsEditModalVisible(false)} // Correct handler
+          onFetchCategories={fetchCategories} // Ensure this is a function
+          categoryToEdit={selectedCategory}
+        />
+      )}
+      {/* View Category Modal */}
+      {selectedCategory && (
+        <ViewCategoryModal
+          visible={isViewModalVisible}
+          onClose={() => setIsViewModalVisible(false)}
+          category={selectedCategory} // Pass the selected category
+        />
+      )}
+      {/* Delete Category Modal */}
+      {selectedCategory && (
+        <DeleteCategoryModal
+          visible={isDeleteModalVisible}
+          onClose={() => setIsDeleteModalVisible(false)} // Close delete modal
+          onDelete={() => handleDeleteCategory(selectedCategory.id)} // Call the delete handler with the ID
+          category={selectedCategory} // Pass the selected category to the modal
+        />
+      )}
     </div>
   );
 };
