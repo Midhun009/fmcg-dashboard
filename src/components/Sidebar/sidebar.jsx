@@ -110,16 +110,17 @@ const Sidebar = () => {
                   </Link>
                 </li>
                 <li>
-                  <a
-                    href="javascript:void(0);"
+                  <Link
+                    to="product-category" // Adjust the route as needed
                     className={
                       selectedItem === "productCategory" ? "active" : ""
                     }
                     onClick={() => handleItemClick("productCategory")}
                   >
                     Product Category
-                  </a>
+                  </Link>
                 </li>
+
               </ul>
             </li>
             {/* Repeat similar structure for other menu items */}

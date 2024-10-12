@@ -5,6 +5,7 @@ import Homepage from "./pages/homepage";
 import Dashboard from "./components/Dashboard/Dashboard";
 import ProfileSettings from "./components/ProfileSettings/ProfileSettings";
 import ListingCategory from "./pages/Category/Lisitng/ListingCategory";
+import ProductCategory from "./pages/Category/Product/ProductCategory";
 import ProductEnquiry from "./pages/Enquiry/Product/ProductEnquiry";
 import ListingEnquiry from "./pages/Enquiry/Listing/ListingEnquiry";
 
@@ -17,7 +18,7 @@ const AppRoutes = () => {
         <Route path="listing-category" element={<ListingCategory />} />
         <Route path="product-enquiry" element={<ProductEnquiry />} />
         <Route path="listing-enquiry" element={<ListingEnquiry />} />
-        <Route patth="product-category" element={<ListingCategory />} />
+      <Route path="product-category" element={<ProductCategory />} />
         {/* Optionally, add a redirect for the root path */}
         <Route path="/" element={<Navigate to="/dashboard" />} />
       </Route>
