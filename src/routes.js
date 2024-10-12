@@ -4,7 +4,7 @@ import { Route, Routes, Navigate } from "react-router-dom"; // Import Navigate h
 import Homepage from "./pages/homepage";
 import Dashboard from "./components/Dashboard/Dashboard";
 import ProfileSettings from "./components/ProfileSettings/ProfileSettings";
-import ListingCategory from "./pages/Category/ListingCategory";
+import ListingCategory from "./pages/Category/Lisitng/ListingCategory";
 import ProductEnquiry from "./pages/Enquiry/Product/ProductEnquiry";
 import ListingEnquiry from "./pages/Enquiry/Listing/ListingEnquiry";
 
